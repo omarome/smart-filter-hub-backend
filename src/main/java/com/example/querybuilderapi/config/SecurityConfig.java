@@ -17,6 +17,11 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import com.example.querybuilderapi.service.AuthService;
+import com.example.querybuilderapi.model.AuthAccount;
+import com.example.querybuilderapi.dto.AuthResponse;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +32,15 @@ public class SecurityConfig {
 
     @Value("${app.cors.allowed-origins:http://localhost:5173}")
     private String allowedOrigins;
+
+    @Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
+
+    private final AuthService authService;
+
+    public SecurityConfig(AuthService authService) {
+        this.authService = authService;
+    }
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(
@@ -72,6 +86,10 @@ public class SecurityConfig {
                 // Everything else (static, etc.) is open
                 .anyRequest().permitAll()
             )
+            // OAuth2 Login configuration
+            .oauth2Login(oauth2 -> oauth2
+                .successHandler(oauth2SuccessHandler())
+            )
             // Insert JWT filter before UsernamePasswordAuthenticationFilter
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             // Security headers
@@ -85,6 +103,28 @@ public class SecurityConfig {
             );
 
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler oauth2SuccessHandler() {
+        return (request, response, authentication) -> {
+            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+            String email = oAuth2User.getAttribute("email");
+            String name = oAuth2User.getAttribute("name");
+            String sub = oAuth2User.getAttribute("sub"); // Google unique ID
+
+            AuthResponse authResponse = authService.handleOAuthLogin(
+                    email, name, AuthAccount.OAuthProvider.GOOGLE, sub);
+
+            // Redirect back to frontend with tokens as URL parameters
+            // The frontend will parse these and log the user in
+            String targetUrl = String.format("%s/login-success?accessToken=%s&refreshToken=%s",
+                    frontendUrl,
+                    authResponse.getAccessToken(),
+                    authResponse.getRefreshToken());
+
+            response.sendRedirect(targetUrl);
+        };
     }
 
     @Bean
