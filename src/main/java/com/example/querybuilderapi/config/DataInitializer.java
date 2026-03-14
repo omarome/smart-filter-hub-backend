@@ -28,6 +28,7 @@ public class DataInitializer {
                     "Hobby Admin",
                     AuthAccount.Role.ADMIN,
                     AuthAccount.OAuthProvider.LOCAL,
+                    null,
                     null
                 );
                 repository.save(admin);

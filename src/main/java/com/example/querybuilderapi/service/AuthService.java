@@ -55,6 +55,7 @@ public class AuthService {
                 request.getDisplayName(),
                 AuthAccount.Role.USER,
                 AuthAccount.OAuthProvider.LOCAL,
+                null,
                 null
         );
         account = authAccountRepository.save(account);

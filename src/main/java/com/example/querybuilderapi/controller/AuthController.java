@@ -108,7 +108,8 @@ public class AuthController {
                 account.getId(),
                 account.getEmail(),
                 account.getDisplayName(),
-                account.getRole().name()
+                account.getRole().name(),
+                account.getPhotoUrl()
         );
         return ResponseEntity.ok(userInfo);
     }

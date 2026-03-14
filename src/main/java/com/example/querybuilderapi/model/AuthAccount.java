@@ -45,6 +45,9 @@ public class AuthAccount {
     @Column(name = "oauth_id")
     private String oauthId;
 
+    @Column(name = "photo_url")
+    private String photoUrl;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -99,6 +102,9 @@ public class AuthAccount {
 
     public String getOauthId() { return oauthId; }
     public void setOauthId(String oauthId) { this.oauthId = oauthId; }
+
+    public String getPhotoUrl() { return photoUrl; }
+    public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
 
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
