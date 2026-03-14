@@ -111,9 +111,10 @@ public class SecurityConfig {
             String email = oAuth2User.getAttribute("email");
             String name = oAuth2User.getAttribute("name");
             String sub = oAuth2User.getAttribute("sub"); // Google unique ID
+            String picture = oAuth2User.getAttribute("picture"); // Google profile picture
 
             AuthResponse authResponse = authService.handleOAuthLogin(
-                    email, name, AuthAccount.OAuthProvider.GOOGLE, sub);
+                    email, name, AuthAccount.OAuthProvider.GOOGLE, sub, picture);
 
             // Redirect back to frontend with tokens as URL parameters
             // The frontend will parse these and log the user in

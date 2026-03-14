@@ -67,13 +67,14 @@ public class AuthAccount {
     public AuthAccount() {}
 
     public AuthAccount(String email, String passwordHash, String displayName,
-                       Role role, OAuthProvider oauthProvider, String oauthId) {
+                       Role role, OAuthProvider oauthProvider, String oauthId, String photoUrl) {
         this.email = email;
         this.passwordHash = passwordHash;
         this.displayName = displayName;
         this.role = role;
         this.oauthProvider = oauthProvider;
         this.oauthId = oauthId;
+        this.photoUrl = photoUrl;
     }
 
     // --- Getters & Setters ---

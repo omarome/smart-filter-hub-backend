@@ -114,21 +114,31 @@ public class AuthService {
      */
     @Transactional
     public AuthResponse handleOAuthLogin(String email, String displayName,
-                                          AuthAccount.OAuthProvider provider, String oauthId) {
+                                          AuthAccount.OAuthProvider provider, String oauthId, String photoUrl) {
         AuthAccount account = authAccountRepository
                 .findByOauthProviderAndOauthId(provider, oauthId)
+                .map(existing -> {
+                    // Update photoUrl even for existing OAuth accounts if it's provided
+                    if (photoUrl != null) {
+                        existing.setPhotoUrl(photoUrl);
+                    }
+                    return authAccountRepository.save(existing);
+                })
                 .orElseGet(() -> {
                     // Check if a local account with this email exists — link it
                     AuthAccount existing = authAccountRepository.findByEmail(email).orElse(null);
                     if (existing != null) {
                         existing.setOauthProvider(provider);
                         existing.setOauthId(oauthId);
+                        if (photoUrl != null) {
+                            existing.setPhotoUrl(photoUrl);
+                        }
                         return authAccountRepository.save(existing);
                     }
                     // Create a brand-new OAuth account
                     AuthAccount newAccount = new AuthAccount(
                             email, null, displayName,
-                            AuthAccount.Role.USER, provider, oauthId
+                            AuthAccount.Role.USER, provider, oauthId, photoUrl
                     );
                     return authAccountRepository.save(newAccount);
                 });
@@ -146,7 +156,8 @@ public class AuthService {
                 account.getId(),
                 account.getEmail(),
                 account.getDisplayName(),
-                account.getRole().name()
+                account.getRole().name(),
+                account.getPhotoUrl()
         );
 
         return new AuthResponse(
