@@ -147,6 +147,38 @@ public class AuthService {
         return buildAuthResponse(account);
     }
 
+    /**
+     * Update an account's display name.
+     */
+    @Transactional
+    public AuthResponse.UserInfo updateProfile(Long accountId, String displayName) {
+        AuthAccount account = authAccountRepository.findById(accountId)
+                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
+
+        account.setDisplayName(displayName);
+        account = authAccountRepository.save(account);
+
+        return new AuthResponse.UserInfo(
+                account.getId(),
+                account.getEmail(),
+                account.getDisplayName(),
+                account.getRole().name(),
+                account.getPhotoUrl()
+        );
+    }
+
+    /**
+     * Permanently delete an account and its refresh tokens.
+     */
+    @Transactional
+    public void deleteAccount(Long accountId) {
+        if (!authAccountRepository.existsById(accountId)) {
+            throw new IllegalArgumentException("Account not found");
+        }
+        refreshTokenRepository.deleteByAuthAccountId(accountId);
+        authAccountRepository.deleteById(accountId);
+    }
+
     // ── helpers ──────────────────────────────────────────────
 
     private AuthResponse buildAuthResponse(AuthAccount account) {

@@ -3,6 +3,7 @@ package com.example.querybuilderapi.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import java.time.Instant;
 
 /**
@@ -31,6 +32,7 @@ public class AuthAccount {
 
     @Column(name = "display_name", nullable = false)
     @NotBlank(message = "Display name is required")
+    @Pattern(regexp = "^[a-zA-Z0-9 _-]+$", message = "Display name can only contain letters, numbers, spaces, underscores, and hyphens")
     private String displayName;
 
     @Enumerated(EnumType.STRING)

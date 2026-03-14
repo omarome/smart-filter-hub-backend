@@ -113,4 +113,31 @@ public class AuthController {
         );
         return ResponseEntity.ok(userInfo);
     }
+
+    /**
+     * PATCH /api/auth/profile — update the user's profile info.
+     */
+    @PatchMapping("/profile")
+    public ResponseEntity<?> updateProfile(@AuthenticationPrincipal AuthAccount account,
+                                           @Valid @RequestBody UpdateProfileRequest request) {
+        if (account == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Not authenticated"));
+        }
+        AuthResponse.UserInfo userInfo = authService.updateProfile(account.getId(), request.getDisplayName());
+        return ResponseEntity.ok(userInfo);
+    }
+
+    /**
+     * DELETE /api/auth/account — permanently delete the user's account.
+     */
+    @DeleteMapping("/account")
+    public ResponseEntity<?> deleteAccount(@AuthenticationPrincipal AuthAccount account) {
+        if (account == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Not authenticated"));
+        }
+        authService.deleteAccount(account.getId());
+        return ResponseEntity.ok(Map.of("message", "Account deleted successfully"));
+    }
 }
