@@ -24,5 +24,6 @@ VALUES
     ('Fiona', 'Wilson', 33, 'fiona.wilson@example.com', 'Active', true, NULL, 'student'),
     ('George', 'Moore', 38, 'george.moore@example.com', 'Pending', false, 'Geo', 'unemployed'),
     ('Helen', 'Taylor', 26, 'helen.taylor@example.com', 'Active', true, NULL, 'employee')
-ON CONFLICT (email) DO NOTHING;
+ON CONFLICT (email) DO UPDATE 
+SET user_type = EXCLUDED.user_type;
 
